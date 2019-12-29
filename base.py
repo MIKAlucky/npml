@@ -1,5 +1,6 @@
 from metrics.classification import accuracy, precision, recall, f1, roc_auc, hinge
-from metrics.regression import r2, mae, mse, explained_variance, max_error, msle, median_absolute_error
+from metrics.regression import r2, mae, mse, explained_variance, max_error, msle, \
+    median_absolute_error
 from types import FunctionType
 from typing import Callable
 import numpy as np
@@ -37,7 +38,8 @@ class BaseMixin:
     """所有Mixin类的基类"""
     _model_type = 'Model'
 
-    def score(self, X: np.ndarray, y: np.ndarray, scorer: Callable[[np.ndarray, np.ndarray], float]) -> float:
+    def score(self, X: np.ndarray, y: np.ndarray,
+              scorer: Callable[[np.ndarray, np.ndarray], float]) -> float:
         """模型在X,y上的评分
 
         @param X: 样本数据
@@ -55,7 +57,6 @@ class ClassifierMixin(BaseMixin):
     _model_type = 'Classifier'
 
 
-
 class RegressorMixin(BaseMixin):
     """所有回归模型的Mixin类"""
     _model_type = 'Regressor'
@@ -64,4 +65,3 @@ class RegressorMixin(BaseMixin):
 class ClusterMixin(BaseMixin):
     """所有聚类模型的Mixin类"""
     _model_type = 'Clusterer'
-    

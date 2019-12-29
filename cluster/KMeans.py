@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 
 from base import ClusterMixin, UnsupervisedModel
@@ -8,7 +6,8 @@ from utils.distances import euclidean_distance
 
 class KMeans(UnsupervisedModel, ClusterMixin):
 
-    def fit(self, X: np.ndarray, k=8, init_centriods_method="kmeans++", max_iter=100000, tol=1e-10, distance=euclidean_distance):
+    def fit(self, X: np.ndarray, k: int = 8, init_centriods_method="kmeans++", max_iter=100000,
+            tol=1e-10, distance=euclidean_distance):
         """
         Parameters
         ----------
