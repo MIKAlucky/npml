@@ -1,10 +1,10 @@
 import numpy as np
 from numpy.linalg import pinv
 
-from base import RegressorMixin, SupervisedModel
+from base import RegressorMixin
 
 
-class OrdinaryLeastSquare(SupervisedModel, RegressorMixin):
+class OrdinaryLeastSquare(RegressorMixin):
 
     def fit(self, X, Y):
         """训练

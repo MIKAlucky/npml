@@ -1,10 +1,9 @@
 """主成分分析"""
 
 import numpy as np
-from base import UnsupervisedModel, ClusterMixin
 
 
-class PCA(UnsupervisedModel, ClusterMixin):
+class PCA():
     def __init__(self):
         super(PCA, self).__init__()
         self.model_type = "PCA"

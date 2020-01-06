@@ -105,7 +105,8 @@ def cosine_similiarity(x1, x2):
     """
     return np.dot(x1, x2) / np.sqrt(np.sum(x1 ** 2)) / np.sqrt(np.sum(x2 ** 2))
 
+
 if __name__ == '__main__':
-    x1 = np.array([1,2,3])
-    x2 = np.array([4,5,6])
-    print(cosine_similiarity(x1,x2))
+    x1 = np.array([1, 2, 3])
+    x2 = np.array([4, 5, 6])
+    print(cosine_similiarity(x1, x2))

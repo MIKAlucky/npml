@@ -6,8 +6,8 @@ from utils.distances import euclidean_distance
 
 class KMeans(UnsupervisedModel, ClusterMixin):
 
-    def fit(self, X: np.ndarray, k: int = 8, init_centriods_method="kmeans++", max_iter=100000,
-            tol=1e-10, distance=euclidean_distance):
+    def fit(self, X, k=8, init_centriods_method="random", max_iter=100000, tol=1e-10,
+            distance=euclidean_distance):
         """
         Parameters
         ----------
@@ -33,32 +33,48 @@ class KMeans(UnsupervisedModel, ClusterMixin):
         Return
         ------
             self
-                self.centers: 质心, (k)
-                self.results: 存放每个点对应到哪个类, key为类，value为点的集合
+                self.centeriods: 质心, (k)
+                self.labels:     存放每个点对应的类
         """
         # 初始化质心
-        centriods = self._init_centriods(X, k, method=init_centriods_method)
+        self._init_centriods(X, k, method=init_centriods_method)
+        centriods_changed = True
+        self.labels = np.zeros(len(X))  # 用于存放每个样本点对应的类
+        # 当 质心变化时进入循环
+        while centriods_changed:
+            # 对每个样本，计算其属于哪个类
+            for i, x in enumerate(X):
+                # distances = 当前点x 和 所有质心 的距离
+                distances = np.array(
+                    [distance(x, self.centriods[i]) for i in range(k)])
+                self.labels[i] = distances.argmin()
+            # 对每个类，更新其质心
+            updated_centriods = np.array(
+                [np.mean(X[self.labels == i], axis=0) for i in range(k)])
+            if updated_centriods.tolist() == self.centriods.tolist():
+                centriods_changed = False
+                return self
+            else:
+                self.centriods = updated_centriods
 
-    @staticmethod
-    def _init_centriods(self, X: np.ndarray, k: int, method: str = "Kmeans++"):
+    def _init_centriods(self, X: np.ndarray, k: int, method: str = "random"):
         """初始化聚类中心"""
-        if method not in ["Random", "KMeans++"]:
-            raise ValueError("only supported method [Random, KMeans++]")
-        elif method == "Random":  # 从X中随机选取k个点
+        if method not in ["random", "kmeans++"]:
+            raise ValueError("only supported method [random, kmeans++]")
+        elif method == "random":  # 从X中随机选取k个点
             indices = np.random.choice(len(X), k, replace=False)
             self.centriods = X[indices]
         else:  # KMeans++ TODO
             centriods_indices = np.zeros(k)  # 初始化聚类中心点索引
             # 1、随机选择一个点作为第一个聚类中心
-            first_index = np.random.choice(len(X), 1)[0]
-
+            # first_index = np.random.choice(len(X), 1)[0]
             self.centriods = X[centriods_indices]
-        return self.centriods
+        return self
 
     @staticmethod
     def _get_nearest_class(sample, centers):
-        """点sample离centers中哪个质心更近，返回哪个质心的索引 + 1"""
-        return np.argmin(np.sqrt(np.sum((centers - sample) ** 2, axis=1))) + 1
+        """点sample离centers中哪个质心更近，返回哪个质心的索引"""
+        return np.argmin(np.sqrt(np.sum((centers - sample) ** 2, axis=1)))
 
     def predict(self, X):
         """预测
@@ -70,4 +86,14 @@ class KMeans(UnsupervisedModel, ClusterMixin):
         ------
         数据集每个点分到的类, (n_samples)
         """
-        return np.array([KMeans._get_nearest_class(x, self.centers) for x in X])
+        return np.array([self._get_nearest_class(x, self.centriods) for x in X])
+
+
+if __name__ == "__main__":
+    import sys
+    sys.path.append('/Users/chenxilin/Code/Python/npml')
+    X = np.array([[1, 1], [1, 2], [2, 1], [1, 10],
+                  [2, 10], [2, 9], [9, 9], [9, 10]])
+    model = KMeans()
+    model.fit(X, k=3)
+    print(model.predict(np.array([[1, 0], [11, 12]])))
