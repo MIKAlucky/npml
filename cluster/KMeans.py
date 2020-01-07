@@ -6,7 +6,7 @@ from utils.distances import euclidean_distance
 
 class KMeans(UnsupervisedModel, ClusterMixin):
 
-    def fit(self, X, k=8, init_centriods_method="random", max_iter=100000, tol=1e-10,
+    def fit(self, X, k=8, init_centriods_method="random", max_iter=100000,
             distance=euclidean_distance):
         """
         Parameters
@@ -21,7 +21,6 @@ class KMeans(UnsupervisedModel, ClusterMixin):
                   然后选择使得d最大的那个点xi作为下一个聚类中心
                 - 重复以上两步骤，直到选择了k个聚类中心
         max_iter: 最大迭代次数，到达max_iter则停止迭代
-        tol: 质心前后两次变化的最大误差小于tol则停止迭代
         distance: 距离函数
             - 欧氏距离
             - 曼哈顿距离
@@ -40,6 +39,7 @@ class KMeans(UnsupervisedModel, ClusterMixin):
         self._init_centriods(X, k, method=init_centriods_method)
         centriods_changed = True
         self.labels = np.zeros(len(X))  # 用于存放每个样本点对应的类
+        count = 0
         # 当 质心变化时进入循环
         while centriods_changed:
             # 对每个样本，计算其属于哪个类
@@ -52,10 +52,15 @@ class KMeans(UnsupervisedModel, ClusterMixin):
             updated_centriods = np.array(
                 [np.mean(X[self.labels == i], axis=0) for i in range(k)])
             if updated_centriods.tolist() == self.centriods.tolist():
+                print('已收敛，停止迭代')
                 centriods_changed = False
-                return self
             else:
                 self.centriods = updated_centriods
+            count += 1
+            if count == max_iter:
+                print('达到最大迭代次数，停止迭代')
+                return self
+        return self
 
     def _init_centriods(self, X: np.ndarray, k: int, method: str = "random"):
         """初始化聚类中心"""
@@ -90,10 +95,9 @@ class KMeans(UnsupervisedModel, ClusterMixin):
 
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append('/Users/chenxilin/Code/Python/npml')
     X = np.array([[1, 1], [1, 2], [2, 1], [1, 10],
                   [2, 10], [2, 9], [9, 9], [9, 10]])
     model = KMeans()
     model.fit(X, k=3)
+    print(model.centriods)
     print(model.predict(np.array([[1, 0], [11, 12]])))
