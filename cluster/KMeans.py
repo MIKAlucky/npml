@@ -2,6 +2,7 @@ import numpy as np
 
 from base import ClusterMixin, UnsupervisedModel
 from utils.distances import euclidean_distance
+from exceptions import NotFittedError
 
 
 class KMeans(UnsupervisedModel, ClusterMixin):
@@ -21,7 +22,7 @@ class KMeans(UnsupervisedModel, ClusterMixin):
                   然后选择使得d最大的那个点xi作为下一个聚类中心
                 - 重复以上两步骤，直到选择了k个聚类中心
         max_iter: 最大迭代次数，到达max_iter则停止迭代
-        distance: 距离函数
+        distance: 距离函数，默认欧氏距离，支持多种，可自定义
             - 欧氏距离
             - 曼哈顿距离
             - 切比雪夫距离
@@ -91,6 +92,9 @@ class KMeans(UnsupervisedModel, ClusterMixin):
         ------
         数据集每个点分到的类, (n_samples)
         """
+        # fit之后会添加属性labels和centriods，遂可根据这个判断是否模型已经训练
+        if not hasattr(self, 'labels') or not hasattr(self, 'centriods'):
+            raise NotFittedError('fit first, then predict')
         return np.array([self._get_nearest_class(x, self.centriods) for x in X])
 
 
