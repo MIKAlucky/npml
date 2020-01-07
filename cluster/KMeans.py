@@ -10,31 +10,16 @@ class KMeans(UnsupervisedModel, ClusterMixin):
     def fit(self, X, k=8, init_centriods_method="random", max_iter=100000,
             distance=euclidean_distance):
         """
-        Parameters
-        ----------
-        X: 训练集, (n_samples, n_features)
-        k: 将X聚成k类
-        init_centriods_method: 初始化聚类中心的方式
-            - random 随机选择样本X中的k个点作为初始聚类中心
-            - kmeans++
-                - 从输入的数据点集合中随机选择一个点作为第一个聚类中心
-                - 对于数据集中的每一个点xi，计算它与已选择的聚类中心中最近聚类中心的距离d，
-                  然后选择使得d最大的那个点xi作为下一个聚类中心
-                - 重复以上两步骤，直到选择了k个聚类中心
-        max_iter: 最大迭代次数，到达max_iter则停止迭代
-        distance: 距离函数，默认欧氏距离，支持多种，可自定义
-            - 欧氏距离
-            - 曼哈顿距离
-            - 切比雪夫距离
-            - 闵可夫斯基距离
-            - 标准化欧氏距离
-            - 马氏距离
-            - 巴氏距离
-        Return
-        ------
-            self
-                self.centeriods: 质心, (k)
-                self.labels:     存放每个点对应的类
+        :param X: 训练集, (n_samples, n_features)
+        :param k: 将X聚成k类
+        :param init_centriods_method: 初始化聚类中心的方式
+               - random 随机选择样本X中的k个点作为初始聚类中心
+               - kmeans++
+        :param max_iter: 最大迭代次数，到达max_iter则停止迭代
+        :param distance: 距离函数，默认欧氏距离，支持多种距离函数
+        :return: self
+                 self.centeriods: 质心, (k)
+                 self.labels:     存放每个点对应的类
         """
         # 初始化质心
         self._init_centriods(X, k, method=init_centriods_method)
@@ -71,6 +56,10 @@ class KMeans(UnsupervisedModel, ClusterMixin):
             indices = np.random.choice(len(X), k, replace=False)
             self.centriods = X[indices]
         else:  # KMeans++ TODO
+            # - 从输入的数据点集合中随机选择一个点作为第一个聚类中心
+            # - 对于数据集中的每一个点xi，计算它与已选择的聚类中心中最近聚类中心的距离d，
+            # 然后选择使得d最大的那个点xi作为下一个聚类中心
+            # - 重复以上两步骤，直到选择了k个聚类中心
             centriods_indices = np.zeros(k)  # 初始化聚类中心点索引
             # 1、随机选择一个点作为第一个聚类中心
             # first_index = np.random.choice(len(X), 1)[0]
