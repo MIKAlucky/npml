@@ -50,12 +50,10 @@ class KMeans(UnsupervisedModel, ClusterMixin):
 
     def _init_centriods(self, X: np.ndarray, k: int, method: str = "random"):
         """初始化聚类中心"""
-        if method not in ["random", "kmeans++"]:
-            raise ValueError("only supported method [random, kmeans++]")
-        elif method == "random":  # 从X中随机选取k个点
+        if method == "random":
             indices = np.random.choice(len(X), k, replace=False)
             self.centriods = X[indices]
-        else:  # KMeans++ TODO
+        elif method == 'kmeans++':  # KMeans++ TODO
             # - 从输入的数据点集合中随机选择一个点作为第一个聚类中心
             # - 对于数据集中的每一个点xi，计算它与已选择的聚类中心中最近聚类中心的距离d，
             # 然后选择使得d最大的那个点xi作为下一个聚类中心
@@ -64,6 +62,8 @@ class KMeans(UnsupervisedModel, ClusterMixin):
             # 1、随机选择一个点作为第一个聚类中心
             # first_index = np.random.choice(len(X), 1)[0]
             self.centriods = X[centriods_indices]
+        else:
+            raise ValueError("only supported method [random, kmeans++]")
         return self
 
     @staticmethod
